@@ -4,26 +4,27 @@ import {
   BarChart, Bar,
 } from 'recharts'
 import { getOverview, getInsights } from '../api.js'
+import { mockOverview, mockInsights } from '../mockData.js'
 import KpiCard from '../components/KpiCard.jsx'
 
 export default function Overview() {
   const [data, setData] = useState(null)
   const [insights, setInsights] = useState([])
-  const [error, setError] = useState(null)
+  const [usingMockData, setUsingMockData] = useState(false)
 
   useEffect(() => {
-    getOverview().then(setData).catch(e => setError(e.message))
-    getInsights().then(d => setInsights(d.insights || [])).catch(() => {})
+    getOverview()
+      .then(setData)
+      .catch(() => {
+        setData(mockOverview)
+        setUsingMockData(true)
+      })
+
+    getInsights()
+      .then(d => setInsights(d.insights || []))
+      .catch(() => setInsights(mockInsights))
   }, [])
 
-  if (error) {
-    return (
-      <div className="card text-red-500">
-        Couldn't reach the API — make sure the FastAPI backend is running on :8000.
-        <div className="text-xs text-teal/50 mt-2">{error}</div>
-      </div>
-    )
-  }
   if (!data) return <div className="text-teal/50">Loading overview…</div>
 
   const { kpis, revenue_trend, sales_by_region, top_products } = data
@@ -33,6 +34,9 @@ export default function Overview() {
       <div>
         <h1 className="text-xl font-semibold text-teal">Executive overview</h1>
         <p className="text-teal/50 text-xs mt-1">Business health at a glance</p>
+        {usingMockData && (
+          <p className="text-[11px] text-gold mt-1">Showing sample data — backend not connected yet</p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -96,7 +100,6 @@ export default function Overview() {
                 <span>{line}</span>
               </li>
             ))}
-            {insights.length === 0 && <li className="text-teal/40">Generating insights…</li>}
           </ul>
         </div>
       </div>
