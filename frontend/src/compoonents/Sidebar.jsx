@@ -7,7 +7,7 @@ const menuItems = [
   { icon: "⚠", label: "Anomalies" },
 ];
 
-function Sidebar() {
+function Sidebar({ activePage, setActivePage }) {
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -24,10 +24,14 @@ function Sidebar() {
 
         <nav>
           {menuItems.map((item, index) => (
-            <button
-              key={item.label}
-              className={`nav-item ${index === 0 ? "active" : ""}`}
-            >
+            
+          <button
+  key={item.label}
+  className={`nav-item ${
+    activePage === item.label.toLowerCase() ? "active" : ""
+  }`}
+  onClick={() => setActivePage(item.label.toLowerCase())}
+>
               <span className="nav-icon">{item.icon}</span>
               <span>{item.label}</span>
             </button>
