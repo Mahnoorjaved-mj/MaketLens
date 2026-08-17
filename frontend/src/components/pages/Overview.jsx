@@ -1,108 +1,376 @@
-import { useEffect, useState } from 'react'
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
-  BarChart, Bar,
-} from 'recharts'
-import { getOverview, getInsights } from '../api.js'
-import { mockOverview, mockInsights } from '../mockData.js'
-import KpiCard from '../components/KpiCard.jsx'
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
 
-export default function Overview() {
-  const [data, setData] = useState(null)
-  const [insights, setInsights] = useState([])
-  const [usingMockData, setUsingMockData] = useState(false)
+import KpiCard from "../KpiCard";
 
-  useEffect(() => {
-    getOverview()
-      .then(setData)
-      .catch(() => {
-        setData(mockOverview)
-        setUsingMockData(true)
-      })
+const revenueData = [
+  { month: "Jan", revenue: 42000 },
+  { month: "Feb", revenue: 51000 },
+  { month: "Mar", revenue: 47000 },
+  { month: "Apr", revenue: 63000 },
+  { month: "May", revenue: 72000 },
+  { month: "Jun", revenue: 68000 },
+  { month: "Jul", revenue: 84000 },
+  { month: "Aug", revenue: 92000 },
+];
 
-    getInsights()
-      .then(d => setInsights(d.insights || []))
-      .catch(() => setInsights(mockInsights))
-  }, [])
+const categoryData = [
+  { name: "Technology", sales: 82000 },
+  { name: "Electronics", sales: 68000 },
+  { name: "Furniture", sales: 52000 },
+  { name: "Accessories", sales: 39000 },
+];
 
-  if (!data) return <div className="text-teal/50">Loading overview…</div>
-
-  const { kpis, revenue_trend, sales_by_region, top_products } = data
-
+function Overview() {
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-xl font-semibold text-teal">Executive overview</h1>
-        <p className="text-teal/50 text-xs mt-1">Business health at a glance</p>
-        {usingMockData && (
-          <p className="text-[11px] text-gold mt-1">Showing sample data — backend not connected yet</p>
-        )}
+    <div className="dashboard">
+
+      {/* HEADER */}
+      <div className="page-header">
+
+        <div>
+          <span className="eyebrow">
+            BUSINESS OVERVIEW
+          </span>
+
+          <h2>
+            Good morning, Mahnoor
+          </h2>
+
+          <p>
+            Here's what's happening across your business today.
+          </p>
+        </div>
+
+        <div className="header-actions">
+
+          <button className="date-button">
+            ◷ &nbsp; August 2026
+          </button>
+
+          <button className="primary-button">
+            + Add Report
+          </button>
+
+        </div>
+
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <KpiCard label="Revenue" value={`$${kpis.total_revenue.toLocaleString()}`} />
-        <KpiCard label="Profit" value={`$${kpis.total_profit.toLocaleString()}`} />
-        <KpiCard label="Orders" value={kpis.total_orders.toLocaleString()} />
-        <KpiCard label="Margin" value={`${kpis.profit_margin}%`} />
+      {/* KPI CARDS */}
+      <div className="kpi-grid">
+
         <KpiCard
-          label="Growth 30d"
-          value={`${kpis.revenue_growth_30d >= 0 ? '+' : ''}${kpis.revenue_growth_30d}%`}
-          accent
+          title="Total Revenue"
+          value="$124.8K"
+          change="12.4%"
+          icon="$"
         />
+
+        <KpiCard
+          title="Total Sales"
+          value="3,842"
+          change="8.2%"
+          icon="↗"
+        />
+
+        <KpiCard
+          title="Customers"
+          value="8,421"
+          change="5.7%"
+          icon="♙"
+        />
+
+        <KpiCard
+          title="Avg. Order Value"
+          value="$84.32"
+          change="4.8%"
+          icon="◇"
+        />
+
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <div className="card lg:col-span-2">
-          <div className="text-[13px] font-medium text-teal mb-3">Revenue trend</div>
-          <ResponsiveContainer width="100%" height={240}>
-            <LineChart data={revenue_trend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E2EDED" />
-              <XAxis dataKey="date" hide />
-              <YAxis stroke="#465C59" fontSize={11} />
-              <Tooltip contentStyle={{ background: '#FDFCFA', border: '1px solid #E2EDED' }} />
-              <Line type="monotone" dataKey="revenue" stroke="#465C59" strokeWidth={2} dot={false} />
-            </LineChart>
-          </ResponsiveContainer>
+      {/* MAIN GRID */}
+      <div className="dashboard-grid">
+
+        {/* REVENUE CHART */}
+        <div className="dashboard-card revenue-card">
+
+          <div className="card-header">
+
+            <div>
+              <h3>Revenue Performance</h3>
+              <p>Monthly revenue overview</p>
+            </div>
+
+            <button className="more-button">
+              ⋮
+            </button>
+
+          </div>
+
+          <div className="chart-container">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <AreaChart data={revenueData}>
+
+                <defs>
+                  <linearGradient
+                    id="revenueGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="#465C59"
+                      stopOpacity={0.25}
+                    />
+
+                    <stop
+                      offset="100%"
+                      stopColor="#465C59"
+                      stopOpacity={0}
+                    />
+                  </linearGradient>
+                </defs>
+
+                <CartesianGrid
+                  stroke="#D5E0DE"
+                  strokeDasharray="3 3"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="month"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#71827F", fontSize: 12 }}
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#71827F", fontSize: 12 }}
+                  tickFormatter={(value) =>
+                    `$${value / 1000}k`
+                  }
+                />
+
+                <Tooltip />
+
+                <Area
+                  type="monotone"
+                  dataKey="revenue"
+                  stroke="#465C59"
+                  strokeWidth={3}
+                  fill="url(#revenueGradient)"
+                />
+
+              </AreaChart>
+            </ResponsiveContainer>
+
+          </div>
+
         </div>
 
-        <div className="card bg-ice border-none">
-          <div className="text-[13px] font-medium text-teal mb-3">Sales by region</div>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={sales_by_region} layout="vertical" margin={{ left: 10 }}>
-              <XAxis type="number" stroke="#465C59" fontSize={10} />
-              <YAxis type="category" dataKey="region_name" stroke="#465C59" fontSize={10} width={80} />
-              <Tooltip contentStyle={{ background: '#FDFCFA', border: '1px solid #E2EDED' }} />
-              <Bar dataKey="revenue" fill="#CFA12C" radius={[0, 6, 6, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        {/* AI INSIGHT */}
+        <div className="dashboard-card insight-card">
+
+          <div className="card-header">
+
+            <div>
+              <span className="ai-label">
+                ✦ AI POWERED
+              </span>
+
+              <h3>Business Insight</h3>
+            </div>
+
+          </div>
+
+          <div className="insight-main">
+
+            <div className="insight-circle">
+              <span>+14.8%</span>
+              <small>forecast</small>
+            </div>
+
+            <div className="insight-text">
+              <strong>
+                Revenue is expected to grow
+              </strong>
+
+              <p>
+                Based on current sales patterns,
+                customer behavior and historical
+                performance.
+              </p>
+            </div>
+
+          </div>
+
+          <div className="insight-divider" />
+
+          <div className="insight-row">
+            <span>Confidence</span>
+            <strong>92%</strong>
+          </div>
+
+          <div className="insight-row">
+            <span>Trend</span>
+            <strong className="trend-positive">
+              ↑ Strong growth
+            </strong>
+          </div>
+
         </div>
+
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-        <div className="card lg:col-span-2">
-          <div className="text-[13px] font-medium text-teal mb-3">Top products</div>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={top_products}>
-              <XAxis dataKey="product_name" stroke="#465C59" fontSize={9} interval={0} angle={-15} textAnchor="end" height={50} />
-              <YAxis stroke="#465C59" fontSize={10} />
-              <Tooltip contentStyle={{ background: '#FDFCFA', border: '1px solid #E2EDED' }} />
-              <Bar dataKey="revenue" fill="#465C59" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+      {/* LOWER GRID */}
+      <div className="dashboard-grid lower-grid">
+
+        {/* CATEGORY */}
+        <div className="dashboard-card">
+
+          <div className="card-header">
+
+            <div>
+              <h3>Sales by Category</h3>
+              <p>Top performing categories</p>
+            </div>
+
+            <button className="more-button">
+              ⋮
+            </button>
+
+          </div>
+
+          <div className="bar-chart">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <BarChart data={categoryData}>
+
+                <CartesianGrid
+                  stroke="#D5E0DE"
+                  strokeDasharray="3 3"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fill: "#71827F",
+                    fontSize: 11,
+                  }}
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{
+                    fill: "#71827F",
+                    fontSize: 11,
+                  }}
+                />
+
+                <Tooltip />
+
+                <Bar
+                  dataKey="sales"
+                  fill="#465C59"
+                  radius={[6, 6, 0, 0]}
+                />
+
+              </BarChart>
+            </ResponsiveContainer>
+
+          </div>
+
         </div>
 
-        <div className="card">
-          <div className="text-[13px] font-medium text-teal mb-3">AI business insights</div>
-          <ul className="space-y-2 text-[13px] text-teal/80">
-            {insights.map((line, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-gold">•</span>
-                <span>{line}</span>
-              </li>
-            ))}
-          </ul>
+        {/* QUICK INSIGHTS */}
+        <div className="dashboard-card">
+
+          <div className="card-header">
+
+            <div>
+              <h3>Quick Insights</h3>
+              <p>What needs your attention</p>
+            </div>
+
+          </div>
+
+          <div className="quick-insights">
+
+            <div className="quick-item">
+              <div className="quick-icon">↑</div>
+
+              <div>
+                <strong>
+                  Sales increased 12.4%
+                </strong>
+
+                <span>
+                  Compared with previous month
+                </span>
+              </div>
+            </div>
+
+            <div className="quick-item">
+              <div className="quick-icon">✦</div>
+
+              <div>
+                <strong>
+                  Technology is leading
+                </strong>
+
+                <span>
+                  Highest revenue category
+                </span>
+              </div>
+            </div>
+
+            <div className="quick-item warning">
+              <div className="quick-icon">△</div>
+
+              <div>
+                <strong>
+                  3 anomalies detected
+                </strong>
+
+                <span>
+                  Review unusual sales activity
+                </span>
+              </div>
+            </div>
+
+          </div>
+
         </div>
+
       </div>
+
     </div>
-  )
+  );
 }
+
+export default Overview;
