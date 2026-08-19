@@ -26,11 +26,11 @@ function Sidebar({ activePage, setActivePage }) {
           {menuItems.map((item, index) => (
             
           <button
-  key={item.label}
-  className={`nav-item ${
-    activePage === item.label.toLowerCase() ? "active" : ""
-  }`}
-  onClick={() => setActivePage(item.label.toLowerCase())}
+          key={item.label}
+          className={`nav-item ${
+          activePage === item.label.toLowerCase() ? "active" : ""
+            }`}
+            onClick={() => setActivePage(item.label.toLowerCase())}
 >
               <span className="nav-icon">{item.icon}</span>
               <span>{item.label}</span>
